@@ -1,38 +1,40 @@
 library(data.table)
-library(TwoSampleMR)
-library(tidyverse)
 
 exposure_file <- "4496_60_MMP12_MMP_12"
 exposure_id <- "MMP12"
 pval_threshold <- 5e-8
+kb_window <- 100000
 
-exposure_gwas <- fread(paste0(
-  "raw_data/soma_pqtl/",
+exp <- fread(paste0(
+  "data/",
   exposure_file,
-  ".txt.gz"
+  ".harmonised.txt.gz"
 ))
-
+str(exp)
 # associated with exposure
-iv <- exposure_gwas %>% filter(Pval < pval_threshold)
+exp <- exp[exp$p_value < pval_threshold, ]
 
 # cis-pQTL
 gene_loci <- readRDS("data/gene_loci.rds")
-gene_loci <- gene_loci %>% filter(gene_name == exposure_id)
-# deCODE used +/- 1mb of the TSS
-iv <- iv %>%
-  filter(
-    Chrom == gene_loci$chromosome,
-    Pos <= gene_loci$tss + 1e+6 & Pos >= gene_loci$tss - 1e+6
-  )
+gene_loci <- gene_loci[gene_loci$gene_name == exposure_id, ]
+# identify SNPs within window of the gene
+# same chromosome
+exp <- exp[exp$chromosome == gsub("chr", "", gene_loci$seqnames), ]
+# within kb window
+exp <- exp[
+  exp$base_pair_location >= gene_loci$start - kb_window &
+    exp$base_pair_location <= gene_loci$end + kb_window,
+]
 
-# remove NA rsid
-iv <- iv %>% drop_na(rsids)
+
+# # remove NA rsid
+# iv <- iv %>% drop_na(rsids)
 
 # export prelim IVs
-saveRDS(iv, paste0("data/", exposure_file, ".iv.first_pass.rds"))
+saveRDS(exp, paste0("data/", exposure_file, ".iv.first_pass.rds"))
 # export info needed for clumping (rsid, pval)
 write.table(
-  data.frame(SNP = iv$rsids, P = iv$Pval),
+  data.frame(SNP = exp$rsid, P = exp$p_value),
   file = paste0("data/", exposure_file, ".iv.to_clump.txt"),
   row.names = FALSE,
   col.names = TRUE,

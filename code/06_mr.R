@@ -1,4 +1,4 @@
-library(TwoSampleMR)
+#library(TwoSampleMR)
 
 exposure_file <- "4496_60_MMP12_MMP_12"
 exposure_id <- "MMP12"

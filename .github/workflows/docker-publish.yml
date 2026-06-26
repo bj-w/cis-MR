@@ -1,0 +1,54 @@
+name: Docker
+
+on:
+  push:
+    branches: [ master ]
+    tags: [ 'v*.*.*' ]
+  workflow_dispatch:  # Allow manual triggering
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v42
+        with:
+          files: |
+            rv.lock
+            rproject.toml
+            Dockerfile
+
+      - name: Build image
+        if: steps.changed-files.outputs.any_changed == 'true' || github.ref_type == 'tag'
+        run: |
+          IMAGE_NAME=$(echo ${{ env.IMAGE_NAME }} | tr '[A-Z]' '[a-z]')
+          docker build . --file Dockerfile --tag $IMAGE_NAME --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Log in to registry
+        if: steps.changed-files.outputs.any_changed == 'true' || github.ref_type == 'tag'
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+      - name: Push image
+        if: steps.changed-files.outputs.any_changed == 'true' || github.ref_type == 'tag'
+        run: |
+          IMAGE_ID=ghcr.io/$(echo ${{ env.IMAGE_NAME }} | tr '[A-Z]' '[a-z]')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "master" ] && VERSION=latest
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag $(echo ${{ env.IMAGE_NAME }} | tr '[A-Z]' '[a-z]') $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION

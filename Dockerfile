@@ -1,5 +1,5 @@
 # R version
-FROM rocker/r-ver:4.6.0
+FROM rocker/r-ver:4.5.1
 
 # Install curl and other linux libraries that R packages need
 RUN apt-get update && apt-get install -y \
@@ -21,13 +21,23 @@ RUN which rv || (echo "rv not found, checking installation..." && \
     ls -la /root/.local/bin/)
 
 # specify work directory
-WORKDIR /workdir
+WORKDIR /project
 
-# Sync rv environment
+# Copy rv metadata
 COPY rproject.toml rproject.toml
 COPY rv.lock rv.lock
+COPY rv/scripts/ rv/scripts/
+
+# Install all R packages
 RUN rv sync
-RUN rv activate
+
+# ✅ Set library path
+ENV R_LIBS_USER=/project/rv/library/4.5/x86_64/noble
+
+# ✅ Overwrite .Rprofile — stop activate.R from running at runtime
+RUN echo '.libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))' > /project/.Rprofile && \
+    echo '.libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))' > /root/.Rprofile && \
+    echo '.libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))' > /usr/local/lib/R/etc/Rprofile.site
 
 # Default to bash terminal when running docker image
 CMD ["bash"]

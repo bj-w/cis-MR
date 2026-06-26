@@ -1,22 +1,35 @@
+#!/usr/bin/env Rscript
+source("/project/rv/scripts/activate.R")
 library(data.table)
-
-exposure_file <- "4496_60_MMP12_MMP_12"
-exposure_id <- "MMP12"
-pval_threshold <- 5e-8
-kb_window <- 100000
+library(optparse)
+# parse arguments
+opt <- parse_args(OptionParser(
+  option_list = list(
+    make_option("--exposureFileDir"),
+    make_option("--exposureFileName"),
+    make_option("--geneSymbol"),
+    make_option("--pvalThreshold"),
+    make_option("--kbWindow")
+  )
+))
+opt$exposureFileDir <- exposure_dir
+opt$exposureFileName <- exposure_file
+opt$geneSymbol <- gene_symbol
+opt$pvalThreshold <- pval_threshold
+opt$kbWindow <- kb_window
 
 exp <- fread(paste0(
-  "data/",
+  exposure_dir, "/",
   exposure_file,
   ".harmonised.txt.gz"
 ))
-str(exp)
+
 # associated with exposure
 exp <- exp[exp$p_value < pval_threshold, ]
 
 # cis-pQTL
 gene_loci <- readRDS("data/gene_loci.rds")
-gene_loci <- gene_loci[gene_loci$gene_name == exposure_id, ]
+gene_loci <- gene_loci[gene_loci$gene_name == gene_symbol, ]
 # identify SNPs within window of the gene
 # same chromosome
 exp <- exp[exp$chromosome == gsub("chr", "", gene_loci$seqnames), ]
@@ -31,11 +44,11 @@ exp <- exp[
 # iv <- iv %>% drop_na(rsids)
 
 # export prelim IVs
-saveRDS(exp, paste0("data/", exposure_file, ".iv.first_pass.rds"))
+saveRDS(exp, paste0(exposure_file, ".iv.first_pass.rds"))
 # export info needed for clumping (rsid, pval)
 write.table(
   data.frame(SNP = exp$rsid, P = exp$p_value),
-  file = paste0("data/", exposure_file, ".iv.to_clump.txt"),
+  file = paste0(exposure_file, ".iv.to_clump.txt"),
   row.names = FALSE,
   col.names = TRUE,
   quote = FALSE

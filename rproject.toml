@@ -1,15 +1,15 @@
 # this config was migrated from renv.lock on 2026-06-26
 [project]
 name = "dev-gca-mr"
-r_version = "4.6"
+r_version = "4.5.1"
 
 repositories = [
     { alias = "CRAN", url = "https://cloud.r-project.org/"},
-    { alias = "BioCsoft", url = "https://bioconductor.org/packages/3.23/bioc"},
-    { alias = "BioCann", url = "https://bioconductor.org/packages/3.23/data/annotation"},
-    { alias = "BioCexp", url = "https://bioconductor.org/packages/3.23/data/experiment"},
-    { alias = "BioCworkflows", url = "https://bioconductor.org/packages/3.23/workflows"},
-    { alias = "BioCbooks", url = "https://bioconductor.org/packages/3.23/books"}
+    { alias = "BioCsoft", url = "https://bioconductor.org/packages/3.21/bioc"},
+    { alias = "BioCann", url = "https://bioconductor.org/packages/3.21/data/annotation"},
+    { alias = "BioCexp", url = "https://bioconductor.org/packages/3.21/data/experiment"},
+    { alias = "BioCworkflows", url = "https://bioconductor.org/packages/3.21/workflows"},
+    { alias = "BioCbooks", url = "https://bioconductor.org/packages/3.21/books"}
 ]
 
 dependencies = [

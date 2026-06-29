@@ -1,3 +1,4 @@
+source("/project/rv/scripts/activate.R")
 library(data.table)
 library(R.utils) # to read gz files
 

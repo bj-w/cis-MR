@@ -1,9 +1,13 @@
-#library(TwoSampleMR)
+#!/usr/bin/env Rscript
+library(TwoSampleMR)
+args <- commandArgs(trailingOnly = TRUE)
+exposure_id <- args[1]
+exp_iv <- args[2]
+out_iv <- args[3]
+exp <- readRDS(exp_iv)
+out <- readRDS(out_iv)
 
-exposure_file <- "4496_60_MMP12_MMP_12"
-exposure_id <- "MMP12"
-exp <- readRDS(paste0("data/", exposure_file, ".exposure_SNPs.rds"))
-out <- readRDS(paste0("data/", exposure_file, ".outcome_SNPs.rds"))
+# format
 exp <- format_data(
   data.frame(exp),
   type = "exposure",
@@ -28,27 +32,18 @@ out <- format_data(
   pval_col = "p_value"
 )
 
-out <- format_data(
-  data.frame(out),
-  type = "outcome",
-  snp_col = "snp_id",
-  beta_col = "beta",
-  se_col = "sebeta",
-  eaf_col = "af_alt",
-  effect_allele_col = "alt",
-  other_allele_col = "ref",
-  pval_col = "pval"
-)
-
+# harmonise
 harm <- harmonise_data(exp, out)
 write.csv(
   harm,
-  paste0("output/", exposure_file, ".IV_harmonised.csv"),
+  paste0(exposure_id, ".IV_harmonised.csv"),
   row.names = FALSE
 )
+
+# MR
 mr_results <- mr(harm)
 write.csv(
   mr_results,
-  paste0("output/", exposure_file, ".mr_results.csv"),
+  paste0(exposure_id, ".mr_results.csv"),
   row.names = FALSE
 )

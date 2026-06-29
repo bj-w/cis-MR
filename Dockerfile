@@ -1,5 +1,5 @@
 # R version
-FROM rocker/r-ver:4.5.1
+FROM rocker/r-ver:4.6.0
 
 # Install curl and other linux libraries that R packages need
 RUN apt-get update && apt-get install -y \
@@ -32,7 +32,7 @@ COPY rv/scripts/ rv/scripts/
 RUN rv sync
 
 # ✅ Set library path
-ENV R_LIBS_USER=/project/rv/library/4.5/x86_64/noble
+ENV R_LIBS_USER=/project/rv/library/4.6/x86_64/noble
 
 # ✅ Overwrite .Rprofile — stop activate.R from running at runtime
 RUN echo '.libPaths(c(Sys.getenv("R_LIBS_USER"), .libPaths()))' > /project/.Rprofile && \

@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-source("/project/rv/scripts/activate.R")
+#source("/project/rv/scripts/activate.R")
 library(data.table)
 library(optparse)
 # parse arguments

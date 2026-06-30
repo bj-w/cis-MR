@@ -3,7 +3,7 @@
 // -------\\
 
 // Parameters
-params.outdir = null
+params.outDir = null
 params.samplesheet = null
 params.gtf = null
 params.outcome = null

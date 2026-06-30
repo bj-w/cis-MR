@@ -1,11 +1,10 @@
 #! /bin/bash
 nextflow run cisMR.nf \
     -resume \
-    --outDir cisMR_output/ \
-    --samplesheet $PWD/samplesheet.csv \
+    --outdir cisMR_output/ \
+    --exposureSamplesheet $PWD/exposure_samplesheet.csv \
+    --outcomeSamplesheet $PWD/outcome_samplesheet.csv \
     --gtf $PWD/raw_data/gencode.v50.basic.annotation.gtf.gz \
-    --outcome $PWD/data/summary_stats_finngen_R13_M13_GIANTCELL.harmonised.gz \
-    --exposureDir $PWD/data/ \
     --pvalThreshold 5e-8 \
     --kbWindow 100000 \
     --bedPopulationLD $PWD/raw_data/1kg/EUR.bed \

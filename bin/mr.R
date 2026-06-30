@@ -3,9 +3,17 @@ library(TwoSampleMR)
 args <- commandArgs(trailingOnly = TRUE)
 exposure_id <- args[1]
 exp_iv <- args[2]
-out_iv <- args[3]
+outcome_id <- args[3]
+out_iv <- args[4]
+
+message("Running MR for exposure: ", exposure_id, " and outcome: ", outcome_id)
+message("files: ", exp_iv, " and ", out_iv)
+
+
 exp <- readRDS(exp_iv)
 out <- readRDS(out_iv)
+
+
 
 # format
 exp <- format_data(

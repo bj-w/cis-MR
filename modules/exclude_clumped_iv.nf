@@ -3,12 +3,13 @@ process EXCLUDE_CLUMPED_IV {
     cpus 4
     memory '16GB'
     time '20min'
+    tag "${exposure_id}"
 
     input:
         tuple val(exposure_id), path(first_pass_rds), path(clumped_file)
 
     output:
-        tuple val(exposure_id), path('*.iv.ld_clumped.rds'), emit: ld_clumped_iv
+        tuple val(exposure_id), path('*iv.ld_clumped.rds'), emit: ld_clumped_iv
 
     script:
     """

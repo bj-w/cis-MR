@@ -1,5 +1,4 @@
 #!/usr/bin/env Rscript
-#source("/project/rv/scripts/activate.R")
 library(rtracklayer)
 args <- commandArgs(trailingOnly = TRUE)
 gencode_path <- args[1]

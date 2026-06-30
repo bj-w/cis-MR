@@ -6,21 +6,20 @@ process IV_FIRST_PASS {
     tag "${exposure_id}"
 
     input:
-        path exposure_dir
-        tuple val(exposure_id), val(gene_symbol)
+        tuple val(exposure_id), val(gene_symbol), path(exposure_file)
         path gene_loci
         val pval
         val kb
 
     output:
-        tuple val(exposure_id), path('*iv.first_pass.rds'), emit: iv_df
-        tuple val(exposure_id), path('*iv.to_clump.txt'), emit: iv_toClump
+        tuple val(exposure_id), path('iv.first_pass.rds'), emit: iv_df
+        tuple val(exposure_id), path('iv.to_clump.txt'), emit: iv_toClump
 
     script:
     """
     iv_first_pass.R \
-        --exposureFileDir ${exposure_dir} \
-        --exposureFileName ${exposure_id} \
+        --exposureFilePath ${exposure_file} \
+        --exposureFileID ${exposure_id} \
         --geneSymbol ${gene_symbol} \
         --geneLoci ${gene_loci} \
         --pvalThreshold ${pval} \

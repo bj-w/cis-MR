@@ -1,19 +1,25 @@
 process MR {
     container 'mrcieu/twosamplemr:0.7.9'
-    memory '8GB'
-    time '20min'
-    tag "${exposure_id}"
-    publishDir "${params.outDir}/", mode: "copy"
+    cpus 4
+    memory '16GB'
+    time '30min'
+    tag "${exposure_id}_${outcome_id}"
+
+    publishDir { "${params.outdir}/${outcome_id}/mr_results" }, mode: 'copy', pattern: '*.mr_results.csv'
+    publishDir { "${params.outdir}/${outcome_id}/harmonised_iv" }, mode: 'copy', pattern: '*.IV_harmonised.csv'
 
     input:
-        tuple val(exposure_id), path(exposure), path(outcome)
+        tuple val(exposure_id), val(outcome_id), path(exposure_iv), path(outcome_iv)
 
     output:
-        path("*.IV_harmonised.csv"), emit: harmonised_IV
-        path("*.mr_results.csv"), emit: mr
+        tuple val(exposure_id), val(outcome_id), path('*mr_results.csv'), path('*IV_harmonised.csv')
 
     script:
     """
-    mr.R ${exposure_id} ${exposure} ${outcome}
+    mr.R \
+        ${exposure_id} \
+        ${exposure_iv} \
+        ${outcome_id} \
+        ${outcome_iv}
     """
 }

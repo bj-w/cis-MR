@@ -1,1 +1,0 @@
-singularity exec https://depot.galaxyproject.org/singularity/plink:1.90b6.21--h7b50bb2_6 code/ld_clump.sh raw_data/1kg/EUR data/4496_60_MMP12_MMP_12.iv.to_clump.txt 1 0.001 10000 data/4496_60_MMP12_MMP_12

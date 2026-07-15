@@ -83,10 +83,15 @@ workflow {
 
     // Create channel based on the initial IVs and the clumped IVs
     ch_combined = ch_iv_first_pass.iv_df
-        .join(ch_ld_clump.clumped_iv)
-        .map { exposure_id, iv_rds, clumped_file ->
-            tuple(exposure_id, iv_rds, clumped_file)
+    .join(ch_ld_clump.clumped_iv, remainder: true)
+    .map { exposure_id, iv_rds, clumped_file ->
+        if (iv_rds == null || clumped_file == null) {
+            log.warn "⚠ No IVs found for exposure: ${exposure_id}"
+            return null
         }
+        tuple(exposure_id, iv_rds, clumped_file)
+    }
+    .filter { it != null }
     // now exclude clumped IVs
     ch_clumped_iv = EXCLUDE_CLUMPED_IV(ch_combined)
 

@@ -12,8 +12,8 @@ process IV_FIRST_PASS {
         val kb
 
     output:
-        tuple val(exposure_id), path('iv.first_pass.rds'), emit: iv_df
-        tuple val(exposure_id), path('iv.to_clump.txt'), emit: iv_toClump
+        tuple val(exposure_id), path('iv.first_pass.rds'), emit: iv_df, optional: true
+        tuple val(exposure_id), path('iv.to_clump.txt'), emit: iv_toClump, optional: true
 
     script:
     """

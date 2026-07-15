@@ -39,14 +39,17 @@ exp <- exp[
     exp$base_pair_location <= gene_info$end + kb_window,
 ]
 
-
-# export prelim IVs
-saveRDS(exp, paste0("iv.first_pass.rds"))
-# export info needed for clumping (rsid, pval)
-write.table(
-  data.frame(SNP = exp$rsid, P = exp$p_value),
-  file = paste0("iv.to_clump.txt"),
-  row.names = FALSE,
-  col.names = TRUE,
-  quote = FALSE
-)
+if (nrow(exp) == 0) {
+  message("No first-pass IVs detected.")
+} else {
+  # export prelim IVs
+  saveRDS(exp, paste0("iv.first_pass.rds"))
+  # export info needed for clumping (rsid, pval)
+  write.table(
+    data.frame(SNP = exp$rsid, P = exp$p_value),
+    file = paste0("iv.to_clump.txt"),
+    row.names = FALSE,
+    col.names = TRUE,
+    quote = FALSE
+  )
+}

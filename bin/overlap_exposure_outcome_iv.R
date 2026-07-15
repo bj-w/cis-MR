@@ -11,7 +11,12 @@ iv <- opt$clumpedIV
 exposure_id <- opt$exposureID
 outcome_id <- opt$outcomeID
 
-message(paste0("Running iv_union.R for exposure: ", exposure_id, " and outcome: ", outcome_id))
+message(paste0(
+  "Running iv_union.R for exposure: ",
+  exposure_id,
+  " and outcome: ",
+  outcome_id
+))
 
 iv <- readRDS(iv)
 # check if exposure IVs are present in outcome data

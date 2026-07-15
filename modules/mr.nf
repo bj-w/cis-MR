@@ -12,10 +12,15 @@ process MR {
         tuple val(exposure_id), val(outcome_id), path(exposure_iv), path(outcome_iv)
 
     output:
-        tuple val(exposure_id), val(outcome_id), path('*mr_results.csv'), path('*IV_harmonised.csv')
+        tuple val(exposure_id), val(outcome_id), path('*mr_results.csv'), path('*IV_harmonised.csv'), optional: true
 
     script:
     """
+    if [ ! -s ${iv_union_file} ]; then
+        echo "No IVs for MR analysis: ${exposure_id} × ${outcome_id}"
+        exit 0
+    fi
+
     mr.R \
         ${exposure_id} \
         ${exposure_iv} \

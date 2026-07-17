@@ -14,7 +14,7 @@ process LD_CLUMP {
         val(kb)
 
     output:
-        tuple val(exposure_id), path('*.clumped'), emit: clumped_iv
+        tuple val(exposure_id), path('*.clumped'), emit: clumped_iv, optional: true
 
     script:
     """

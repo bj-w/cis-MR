@@ -26,8 +26,15 @@ outcome <- lapply(unique(iv$chromosome), \(x) {
 # rbind if list
 outcome <- do.call(rbind, outcome)
 
-iv_in_outcome <- subset(iv, variant_id %in% outcome$variant_id)
+# if SNPs overlap between exposure and outcome: export. Else output nothing.
+common_variants <- intersect(iv$variant_id, outcome$variant_id)
+if(length(common_variants>0)){
+  message(paste0(length(common_variants), " SNPs overlap between exposure and outcome"))
+  iv_in_outcome <- subset(iv, variant_id %in% outcome$variant_id)
 saveRDS(iv_in_outcome, paste0("exposure_IV.rds"))
 
 outcome_snps <- subset(outcome, variant_id %in% iv_in_outcome$variant_id)
 saveRDS(outcome_snps, paste0("outcome_IV.rds"))
+} else {
+  message(paste0("No SNPs overlap between exposure and outcome"))
+}

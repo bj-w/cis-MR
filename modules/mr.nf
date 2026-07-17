@@ -16,7 +16,7 @@ process MR {
 
     script:
     """
-    if [ ! -s ${iv_union_file} ]; then
+    if [ ! -s ${exposure_iv} ]; then
         echo "No IVs for MR analysis: ${exposure_id} × ${outcome_id}"
         exit 0
     fi

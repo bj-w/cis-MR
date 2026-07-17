@@ -112,5 +112,5 @@ workflow {
     // ════════════════════════════════════════════════════════════════
     // STEP 5: Run MR for each exposure-outcome pair
     // ════════════════════════════════════════════════════════════════
-    mr_output = MR(ch_iv_union)
+    MR(ch_iv_union)
 }

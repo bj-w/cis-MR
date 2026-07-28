@@ -69,7 +69,7 @@ Workflow parameters
 | outcomeSamplesheet | CSV file containing info about the outcome(s) | /path/to/outcome_samplesheet.csv |
 | gtf | GTF annotation - only tested with [GENCODE](https://www.gencodegenes.org/human/). | /path/to/gencode.v50.basic.annotation.gtf.gz |
 | pvalThreshold | P-value threshold to define genetic associations with the exposure | 5e-8 |
-| kbWindow | Window around the gene (in kilobases) in which to define cis genetic variants | 100000 |
+| windowTSS | Window around the gene transcription start site (in kilobases) in which to identify <i>cis</i>-acting genetic variants | 1000000 |
 | bedPopulationLD | Path to PLINK bed population LD file | path/to/EUR.bed |
 | bimPopulationLD | Path to PLINK bimpopulation LD file | path/to/EUR.bim |
 | famPopulationLD | Path to PLINK fam population LD file | path/to/EUR.fam |
@@ -86,7 +86,7 @@ nextflow run cisMR.nf \
     --outcomeSamplesheet $PWD/outcome_samplesheet.csv \
     --gtf $PWD/raw_data/gencode.v50.basic.annotation.gtf.gz \
     --pvalThreshold 5e-8 \
-    --kbWindow 100000 \
+    --windowTSS 1000000 \
     --bedPopulationLD $PWD/raw_data/1kg/EUR.bed \
     --bimPopulationLD $PWD/raw_data/1kg/EUR.bim \
     --famPopulationLD $PWD/raw_data/1kg/EUR.fam \

@@ -23,6 +23,6 @@ process IV_FIRST_PASS {
         --geneSymbol ${gene_symbol} \
         --geneLoci ${gene_loci} \
         --pvalThreshold ${pval} \
-        --kbWindow ${kb}
+        --windowTSS ${kb}
     """
 }

@@ -9,7 +9,7 @@ opt <- parse_args(OptionParser(
     make_option("--geneSymbol"),
     make_option("--geneLoci"),
     make_option("--pvalThreshold"),
-    make_option("--kbWindow")
+    make_option("--windowTSS")
   )
 ))
 exposure_path <- opt$exposureFilePath
@@ -17,7 +17,7 @@ exposure_id <- opt$exposureFileID
 gene_symbol <- opt$geneSymbol
 gene_loci_path <- opt$geneLoci
 pval_threshold <- opt$pvalThreshold
-kb_window <- as.numeric(opt$kbWindow)
+window_tss <- as.numeric(opt$windowTSS)
 
 exp <- fread(paste0(exposure_path))
 
@@ -30,13 +30,13 @@ head(gene_info)
 dim(gene_info)
 print(gene_symbol)
 gene_info <- gene_info[gene_info$gene_name == gene_symbol, ]
-# identify SNPs within window of the gene
+# identify SNPs within window of the gene transcription start site
 # same chromosome
 exp <- exp[exp$chromosome == gsub("chr", "", gene_info$seqnames), ]
 # within kb window
 exp <- exp[
-  exp$base_pair_location >= gene_info$start - kb_window &
-    exp$base_pair_location <= gene_info$end + kb_window,
+  exp$base_pair_location >= gene_info$tss - window_tss &
+    exp$base_pair_location <= gene_info$tss + window_tss,
 ]
 
 if (nrow(exp) == 0) {

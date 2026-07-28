@@ -9,7 +9,7 @@ params {
     outcomeSamplesheet = null
     gtf = null
     pvalThreshold = null
-    kbWindow = null
+    windowTSS = null
     bedPopulationLD = null
     bimPopulationLD = null
     famPopulationLD = null
@@ -67,7 +67,7 @@ workflow {
         exposure_samplesheet_ch,
         ch_gene_loci,
         params.pvalThreshold,
-        params.kbWindow
+        params.windowTSS
     )
 
     // perform LD clumping on the initial exposure IVs to find near-independent variants

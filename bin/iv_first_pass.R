@@ -16,7 +16,7 @@ exposure_path <- opt$exposureFilePath
 exposure_id <- opt$exposureFileID
 gene_symbol <- opt$geneSymbol
 gene_loci_path <- opt$geneLoci
-pval_threshold <- opt$pvalThreshold
+pval_threshold <- as.numeric(opt$pvalThreshold)
 window_tss <- as.numeric(opt$windowTSS)
 
 exp <- fread(paste0(exposure_path))

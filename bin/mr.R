@@ -18,7 +18,7 @@ out <- readRDS(out_iv)
 exp <- format_data(
   data.frame(exp),
   type = "exposure",
-  snp_col = "variant_id",
+  snp_col = "rsid",
   beta_col = "beta",
   se_col = "standard_error",
   eaf_col = "effect_allele_frequency",
@@ -30,7 +30,7 @@ exp <- format_data(
 out <- format_data(
   data.frame(out),
   type = "outcome",
-  snp_col = "variant_id",
+  snp_col = "rsid",
   beta_col = "beta",
   se_col = "standard_error",
   eaf_col = "effect_allele_frequency",

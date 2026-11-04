@@ -10,11 +10,12 @@ message("Running MR for exposure: ", exposure_id, " and outcome: ", outcome_id)
 message("files: ", exp_iv, " and ", out_iv)
 
 
+# import exposure and outcome files --------------------------------------
 exp <- readRDS(exp_iv)
 out <- readRDS(out_iv)
 
 
-# format
+# format exposure --------------------------------------------------------
 exp <- format_data(
   data.frame(exp),
   type = "exposure",
@@ -27,30 +28,33 @@ exp <- format_data(
   pval_col = "p_value"
 )
 
+
+# format outcome ---------------------------------------------------------
+# explicitly use harmonised columns. SE and P-value ok.
 out <- format_data(
   data.frame(out),
   type = "outcome",
-  snp_col = "rsid",
-  beta_col = "beta",
+  snp_col = "hm_rsid",
+  beta_col = "hm_beta",
   se_col = "standard_error",
-  eaf_col = "effect_allele_frequency",
-  effect_allele_col = "effect_allele",
-  other_allele_col = "other_allele",
+  eaf_col = "hm_effect_allele_frequency",
+  effect_allele_col = "hm_effect_allele",
+  other_allele_col = "hm_other_allele",
   pval_col = "p_value"
 )
 
-# harmonise
+
+# harmonise --------------------------------------------------------------
 harm <- harmonise_data(exp, out)
-write.csv(
+saveRDS(
   harm,
-  paste0(exposure_id, ".IV_harmonised.csv"),
-  row.names = FALSE
+  paste0(exposure_id, ".IV_harmonised.rds")
 )
 
-# MR
+
+# run MR -----------------------------------------------------------------
 mr_results <- mr(harm)
-write.csv(
+saveRDS(
   mr_results,
-  paste0(exposure_id, ".mr_results.csv"),
-  row.names = FALSE
+  paste0(exposure_id, ".mr_results.rds")
 )

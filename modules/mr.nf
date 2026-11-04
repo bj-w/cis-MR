@@ -5,14 +5,14 @@ process MR {
     time '30min'
     tag "${exposure_id}_${outcome_id}"
 
-    publishDir { "${params.outdir}/${outcome_id}/mr_results" }, mode: 'copy', pattern: '*.mr_results.csv'
-    publishDir { "${params.outdir}/${outcome_id}/harmonised_iv" }, mode: 'copy', pattern: '*.IV_harmonised.csv'
+    publishDir { "${params.outdir}/${outcome_id}/mr_results" }, mode: 'copy', pattern: '*.mr_results.rds'
+    publishDir { "${params.outdir}/${outcome_id}/harmonised_iv" }, mode: 'copy', pattern: '*.IV_harmonised.rds'
 
     input:
         tuple val(exposure_id), val(outcome_id), path(exposure_iv), path(outcome_iv)
 
     output:
-        tuple val(exposure_id), val(outcome_id), path('*mr_results.csv'), path('*IV_harmonised.csv'), optional: true
+        tuple val(exposure_id), val(outcome_id), path('*mr_results.rds'), path('*IV_harmonised.rds'), optional: true
 
     script:
     """

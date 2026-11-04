@@ -27,30 +27,30 @@ exp <- format_data(
   pval_col = "p_value"
 )
 
+# format outcome
+# use harmonised columns where possible. SE and P value ok as don't change.
 out <- format_data(
   data.frame(out),
   type = "outcome",
-  snp_col = "rsid",
-  beta_col = "beta",
+  snp_col = "hm_rsid",
+  beta_col = "hm_beta",
   se_col = "standard_error",
-  eaf_col = "effect_allele_frequency",
-  effect_allele_col = "effect_allele",
-  other_allele_col = "other_allele",
+  eaf_col = "hm_effect_allele_frequency",
+  effect_allele_col = "hm_effect_allele",
+  other_allele_col = "hm_other_allele",
   pval_col = "p_value"
 )
 
 # harmonise
 harm <- harmonise_data(exp, out)
-write.csv(
+saveRDS(
   harm,
-  paste0(exposure_id, ".IV_harmonised.csv"),
-  row.names = FALSE
+  paste0(exposure_id, ".IV_harmonised.rds")
 )
 
 # MR
 mr_results <- mr(harm)
-write.csv(
+saveRDS(
   mr_results,
-  paste0(exposure_id, ".mr_results.csv"),
-  row.names = FALSE
+  paste0(exposure_id, ".mr_results.rds")
 )

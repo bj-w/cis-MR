@@ -40,7 +40,7 @@ workflow {
     exposure_samplesheet_ch = channel
         .fromPath(params.exposureSamplesheet)
         .splitCsv(header: true)
-        .map { row -> tuple(row.exposure_id, row.gene_symbol, row.exposure_file) }
+        .map { row -> tuple(row.exposure_id, row.gene_id, row.exposure_file) }
 
     // outcome samplesheet
     outcome_samplesheet_ch = channel

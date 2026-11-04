@@ -6,7 +6,7 @@ process IV_FIRST_PASS {
     tag "${exposure_id}"
 
     input:
-        tuple val(exposure_id), val(gene_symbol), path(exposure_file)
+        tuple val(exposure_id), val(gene_id), path(exposure_file)
         path gene_loci
         val pval
         val kb
@@ -20,7 +20,7 @@ process IV_FIRST_PASS {
     iv_first_pass.R \
         --exposureFilePath ${exposure_file} \
         --exposureFileID ${exposure_id} \
-        --geneSymbol ${gene_symbol} \
+        --geneID ${gene_id} \
         --geneLoci ${gene_loci} \
         --pvalThreshold ${pval} \
         --windowTSS ${kb}

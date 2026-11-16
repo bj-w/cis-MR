@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript
 library(data.table)
 library(optparse)
+library(tidyverse)
 library(TwoSampleMR)
 
 
@@ -42,14 +43,16 @@ gene_info <- readRDS(gene_loci_path)
 gene_info <- gene_info[gene_info$gene_id == gene_id, ]
 # identify SNPs within window of the gene transcription start site
 # same chromosome
-exp <- exp[exp$chromosome == gsub("chr", "", gene_info$seqnames), ]
+chromosome <- gsub("chr", "", gene_info$seqnames)
+exp <- exp[exp$chromosome == chromosome, ]
 # within kb window
-lower_window <- meta$tss - window_tss
-upper_window <- meta$tss + window_tss
+lower_window <- gene_info$tss - window_tss
+upper_window <- gene_info$tss + window_tss
 exp <- exp[
   exp$base_pair_location >= lower_window &
     exp$base_pair_location <= upper_window,
 ]
+
 
 if (nrow(exp) == 0) {
   message("No cis-pQTLs.")
@@ -66,6 +69,9 @@ exp <- format_data(
   other_allele_col = "other_allele",
   pval_col = "p_value"
 )
+exp <- exp |> mutate(chr = chromosome)
+
+saveRDS(exp, "iv.initial.rds")
 
 # LD clumping
 exp_clumped <- clump_data(
@@ -77,5 +83,5 @@ exp_clumped <- clump_data(
   plink_bin = Sys.which("plink")
 )
 
-saveRDS(exp_clumped, paste0(exposure_id, "iv.ld_clumped.rds"))
+saveRDS(exp_clumped, "iv.ld_clumped.rds")
 }

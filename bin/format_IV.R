@@ -9,6 +9,7 @@ library(gwasvcf)
 opt <- parse_args(OptionParser(
   option_list = list(
     make_option("--clumpedIV"),
+    make_option("--initialIV"),
     make_option("--exposureID"),
     make_option("--outcomeID"),
     make_option("--ldProxyR2"),
@@ -20,6 +21,7 @@ opt <- parse_args(OptionParser(
 ))
 exposure <- opt$clumpedIV
 exposure_id <- opt$exposureID
+exposure_initial <- opt$initialIV
 outcome_id <- opt$outcomeID
 ld_proxy_r2 <- as.numeric(opt$ldProxyR2)
 bfile_paths <- opt$bfilePaths
@@ -37,8 +39,14 @@ message(paste0(
 # import exposure --------------------------------------------------------
 exposure_clumped <- readRDS(exposure)
 
+exposure_initial <- readRDS(exposure_initial)
+# # after formatting with TwoSampleMR, the rsid becomes SNP. However,
+# # the initial file is formatted as rsid. Hacky workaround, need to
+# # think of a better way
+# exposure_initial <- exposure_initial |> rename(SNP = rsid)
+
 # import outcome ---------------------------------------------------------
-outcome <- lapply(unique(exposure$chromosome), \(x) {
+outcome <- lapply(unique(exposure_initial$chr), \(x) {
   readRDS(paste0("chr", x, ".rds"))
 })
 # rbind if list
@@ -59,10 +67,10 @@ outcome <- format_data(
 
 # identify exposure SNPs missing from outcome data
 missing_snps <- filter(exposure_clumped, !SNP %in% outcome$SNP)$SNP
-message(length(missing_snps), "exposure SNPs missing from outcome data.")
+message(length(missing_snps), " exposure SNPs missing from outcome data.")
 # if any are missing, find LD proxies
-if(length(missing_snps > 0)){
-  message(paste0("Identifying LD proxies for ", length(missing_snps), "SNPs. LD proxy threshold = ", ld_proxy_r2))
+if(length(missing_snps) > 0) {
+  message(paste0("Identifying LD proxies for ", length(missing_snps), " SNPs. LD proxy threshold = ", ld_proxy_r2))
 
 set_plink(path = Sys.which("plink"))
 proxies <- get_ld_proxies(
@@ -73,14 +81,14 @@ proxies <- get_ld_proxies(
 )
 proxies <- proxies |>
   # present in exposure
-  filter(SNP_B %in% exposure$SNP) |>
+  filter(SNP_B %in% exposure_initial$SNP) |>
   # pick LD proxy by highest absolute R for each SNP
   slice(which.max(abs(R)), .by = SNP_A)
 
 # remove any IV with proxy available
 iv <- exposure_clumped |>
   filter(SNP %in% proxies$SNP_A) |>
-  bind_rows(exposure |> filter(SNP %in% proxies$SNP_B))
+  bind_rows(exposure_initial |> filter(SNP %in% proxies$SNP_B))
 
 # drop if not in outcome
 iv <- iv |> filter(SNP %in% outcome$SNP)
@@ -101,6 +109,8 @@ if (nrow(iv) > 1) {
 iv <- exposure_clumped
 }
 
+# subset outcome IVs
+outcome <- outcome |> filter(SNP %in% iv$SNP)
 
 # export -----------------------------------------------------------------
 saveRDS(iv, "exposure_IV.rds")

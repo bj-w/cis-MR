@@ -51,6 +51,12 @@ workflow {
     // separate outcome summary statistics by chromosome
     ch_outcome = SEPARATE_OUTCOME_CHR(outcome_samplesheet_ch)
 
+    // Stage LD references
+        def ld_prefix = file(params.LDreferenceFiles).name          // "EUR"
+        def ld_files  = files("${params.LDreferenceFiles}.{bed,bim,fam}", checkIfExists: true)
+
+    ch_ld_ref = channel.value([ld_prefix, ld_files])
+
     // ════════════════════════════════════════════════════════════════
     // STEP 3: Get exposure IVs
     // ════════════════════════════════════════════════════════════════
@@ -61,7 +67,7 @@ workflow {
         ch_gene_loci,
         params.pvalThreshold,
         params.windowTSS,
-        params.LDreferenceFiles,
+        ch_ld_ref,
         params.pvalClump,
         params.r2Clump,
         params.kbClump,
@@ -74,15 +80,15 @@ workflow {
     // specify channel so we create combinations of exposure-outcome pairs
     ch_exposure_outcome_pairs = ch_exposure
         .combine(ch_outcome.outcome_files)
-        .map { exposure_id, iv_clumped, outcome_id, outcome_file ->
-            tuple(exposure_id, outcome_id, iv_clumped, outcome_file)
+        .map { exposure_id, exposure_iv, exposure_iv_initial, outcome_id, outcome_file ->
+            tuple(exposure_id, outcome_id, exposure_iv, exposure_iv_initial, outcome_file)
         }
 
     // Ensure exposure IVs are in outcome data
     ch_iv = FORMAT_IV(
         ch_exposure_outcome_pairs,
         params.LDproxyR2,
-        params.LDreferenceFiles,
+        ch_ld_ref,
         params.pvalClump,
         params.r2Clump,
         params.kbClump,

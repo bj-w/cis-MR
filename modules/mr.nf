@@ -1,5 +1,5 @@
 process MR {
-    container 'mrcieu/twosamplemr:0.7.9'
+    container 'whittlebj/rv-cis-mr:latest'
     cpus 4
     memory '16GB'
     time '30min'

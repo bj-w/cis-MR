@@ -10,13 +10,13 @@ process IV_FIRST_PASS {
         path gene_loci
         val pval
         val tss_kb
-        path bfiles
+        tuple val(ld_prefix), path(ld_files)
         val clump_p1
         val clump_r2
         val clump_kb
 
     output:
-        tuple val(exposure_id), path('iv.ld_clumped.rds'), emit: iv_clumped, optional: true
+        tuple val(exposure_id), path('iv.ld_clumped.rds'), path('iv.initial.rds'), emit: exposure_iv, optional: true
 
     script:
     """
@@ -27,7 +27,7 @@ process IV_FIRST_PASS {
         --geneLoci ${gene_loci} \
         --pvalThreshold ${pval} \
         --windowTSS ${tss_kb} \
-        --bfilePaths ${bfiles} \
+        --bfilePaths ${ld_prefix} \
         --p1clump ${clump_p1} \
         --r2clump ${clump_r2} \
         --kbclump ${clump_kb}

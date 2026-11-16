@@ -76,6 +76,7 @@ Workflow parameters
 | pvalClump | Clumping p-value threshold for index SNPs | 1 |
 | r2Clump | Clumping r2 threshold | 0.001 |
 | kbClump | Clumping window | 10000 |
+| LDproxyR2 | R2 threshold for picking LD proxies | 0.8
 
 These parameters can be passed in a `params.json` file, or when submitting the nextflow script like below
 

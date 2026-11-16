@@ -13,34 +13,6 @@ message("files: ", exp_iv, " and ", out_iv)
 exp <- readRDS(exp_iv)
 out <- readRDS(out_iv)
 
-
-# format
-exp <- format_data(
-  data.frame(exp),
-  type = "exposure",
-  snp_col = "rsid",
-  beta_col = "beta",
-  se_col = "standard_error",
-  eaf_col = "effect_allele_frequency",
-  effect_allele_col = "effect_allele",
-  other_allele_col = "other_allele",
-  pval_col = "p_value"
-)
-
-# format outcome
-# use harmonised columns where possible. SE and P value ok as don't change.
-out <- format_data(
-  data.frame(out),
-  type = "outcome",
-  snp_col = "hm_rsid",
-  beta_col = "hm_beta",
-  se_col = "standard_error",
-  eaf_col = "hm_effect_allele_frequency",
-  effect_allele_col = "hm_effect_allele",
-  other_allele_col = "hm_other_allele",
-  pval_col = "p_value"
-)
-
 # harmonise
 harm <- harmonise_data(exp, out)
 saveRDS(

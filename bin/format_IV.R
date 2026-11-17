@@ -47,10 +47,6 @@ message(paste0(
 exposure_clumped <- readRDS(exposure)
 
 exposure_initial <- readRDS(exposure_initial)
-# # after formatting with TwoSampleMR, the rsid becomes SNP. However,
-# # the initial file is formatted as rsid. Hacky workaround, need to
-# # think of a better way
-# exposure_initial <- exposure_initial |> rename(SNP = rsid)
 
 # import outcome ---------------------------------------------------------
 outcome <- lapply(unique(exposure_initial$chr), \(x) {

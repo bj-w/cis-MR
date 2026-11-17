@@ -6,17 +6,16 @@ process IV_FIRST_PASS {
     tag "${exposure_id}"
 
     input:
-        tuple val(exposure_id), val(gene_id), path(exposure_file)
-        path gene_loci
-        val pval
-        val tss_kb
-        tuple val(ld_prefix), path(ld_files)
-        val clump_p1
-        val clump_r2
-        val clump_kb
+    tuple val(exposure_id), val(gene_id), path(exposure_file)
+    path gene_loci
+    val pval
+    val tss_kb
+    tuple val(ld_prefix), path(ld_files)
+    val ld_clump_params
+    val exposureColumns
 
     output:
-        tuple val(exposure_id), path('iv.ld_clumped.rds'), path('iv.initial.rds'), emit: exposure_iv, optional: true
+    tuple val(exposure_id), path('iv.ld_clumped.rds'), path('iv.initial.rds'), emit: exposure_iv, optional: true
 
     script:
     """
@@ -28,8 +27,15 @@ process IV_FIRST_PASS {
         --pvalThreshold ${pval} \
         --windowTSS ${tss_kb} \
         --bfilePaths ${ld_prefix} \
-        --p1clump ${clump_p1} \
-        --r2clump ${clump_r2} \
-        --kbclump ${clump_kb}
+        --p1clump ${ld_clump_params.pval} \
+        --r2clump ${ld_clump_params.r2} \
+        --kbclump ${ld_clump_params.kb} \
+        --snpCol ${exposureColumns.snp} \
+        --betaCol ${exposureColumns.beta} \
+        --seCol ${exposureColumns.se} \
+        --pvalCol ${exposureColumns.pval} \
+        --eafCol ${exposureColumns.eaf} \
+        --effectAlleleCol ${exposureColumns.effect_allele} \
+        --otherAlleleCol ${exposureColumns.other_allele}
     """
 }

@@ -17,7 +17,14 @@ opt <- parse_args(OptionParser(
     make_option("--bfilePaths"),
     make_option("--p1clump"),
     make_option("--r2clump"),
-    make_option("--kbclump")
+    make_option("--kbclump"),
+    make_option("--snpCol"),
+    make_option("--betaCol"),
+    make_option("--seCol"),
+    make_option("--pvalCol"),
+    make_option("--eafCol"),
+    make_option("--effectAlleleCol"),
+    make_option("--otherAlleleCol")
   )
 ))
 exposure_path <- opt$exposureFilePath
@@ -58,30 +65,37 @@ if (nrow(exp) == 0) {
   message("No cis-pQTLs.")
 } else {
   # format data
-exp <- format_data(
-  dat = as.data.frame(exp),
-  type = "exposure",
-  snp_col = "rsid",
-  beta_col = "beta",
-  se_col = "standard_error",
-  eaf_col = "effect_allele_frequency",
-  effect_allele_col = "effect_allele",
-  other_allele_col = "other_allele",
-  pval_col = "p_value"
-)
-exp <- exp |> mutate(chr = chromosome)
+  exp <- format_data(
+    dat = as.data.frame(exp),
+    type = "exposure",
+    snp_col = opt$snpCol,
+    beta_col = opt$betaCol,
+    se_col = opt$seCol,
+    eaf_col = opt$eafCol,
+    effect_allele_col = opt$effectAlleleCol,
+    other_allele_col = opt$otherAlleleCol,
+    pval_col = opt$pvalCol
+  )
+  exp <- exp |> mutate(chr = chromosome)
+  saveRDS(exp, "iv.initial.rds")
 
-saveRDS(exp, "iv.initial.rds")
-
-# LD clumping
-exp_clumped <- clump_data(
-  dat = exp,
-  clump_kb = clump_kb,
-  clump_r2 = clump_r2,
-  clump_p1 = clump_p1,
-  bfile = bfile_paths,
-  plink_bin = Sys.which("plink")
-)
-
-saveRDS(exp_clumped, "iv.ld_clumped.rds")
+  # run LD clumping if SNPs are found in LD reference. Otherwise workflow crashes.
+  bim_rsid <- fread(paste0(bfile_paths, ".bim"))$V2
+  n_snps_in_lds_ref <- sum(exp$SNP %in% bim_rsid)
+  if (n_snps_in_lds_ref == 0) {
+    message(
+      "No rsid overlap between potential IVs and the LD reference. Sex chromosome?"
+    )
+  } else {
+    # LD clumping
+    exp_clumped <- clump_data(
+      dat = exp,
+      clump_kb = clump_kb,
+      clump_r2 = clump_r2,
+      clump_p1 = clump_p1,
+      bfile = bfile_paths,
+      plink_bin = Sys.which("plink")
+    )
+    saveRDS(exp_clumped, "iv.ld_clumped.rds")
+  }
 }

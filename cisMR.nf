@@ -10,11 +10,25 @@ params {
     gtf = null
     pvalThreshold = null
     windowTSS = null
-    LDreferenceFiles = null
+    ld_reference_files = null
     pvalClump = null
     r2Clump = null
     kbClump = null
-    LDproxyR2 = null
+    ld_proxy_r2_threshold = null
+    exposure_snp_column = null
+    exposure_beta_column = null
+    exposure_se_column = null
+    exposure_pval_column = null
+    exposure_eaf_column = null
+    exposure_effect_allele_column = null
+    exposure_other_allele_column = null
+    outcome_snp_column = null
+    outcome_beta_column = null
+    outcome_se_column = null
+    outcome_pval_column = null
+    outcome_eaf_column = null
+    outcome_effect_allele_column = null
+    outcome_other_allele_column = null
 }
 
 
@@ -41,6 +55,15 @@ workflow {
         .splitCsv(header: true)
         .map { row -> tuple(row.outcome_id, row.outcome_file) }
 
+    // define exposure Columns
+    def exposureColumns = [snp: params.exposure_snp_column, beta: params.exposure_beta_column, se: params.exposure_se_column, pval: params.exposure_pval_column, eaf: params.exposure_eaf_column, effect_allele: params.exposure_effect_allele_column, other_allele: params.exposure_other_allele_column]
+
+    // define outcome columns
+    def outcomeColumns = [snp: params.outcome_snp_column, beta: params.outcome_beta_column, se: params.outcome_se_column, pval: params.outcome_pval_column, eaf: params.outcome_eaf_column, effect_allele: params.outcome_effect_allele_column, other_allele: params.outcome_other_allele_column]
+
+    // define LD clumping parameters
+    def ld_clump_params = [kb: params.kbClump , r2: params.r2Clump ,pval: params.pvalClump]
+
     // ════════════════════════════════════════════════════════════════
     // STEP 2: Setup reference files
     // ════════════════════════════════════════════════════════════════
@@ -52,14 +75,17 @@ workflow {
     ch_outcome = SEPARATE_OUTCOME_CHR(outcome_samplesheet_ch)
 
     // Stage LD references
-        def ld_prefix = file(params.LDreferenceFiles).name          // "EUR"
-        def ld_files  = files("${params.LDreferenceFiles}.{bed,bim,fam}", checkIfExists: true)
+    def ld_prefix = file(params.ld_reference_files).name // "EUR"
+    def ld_files = files("${params.ld_reference_files}.{bed,bim,fam}", checkIfExists: true)
 
     ch_ld_ref = channel.value([ld_prefix, ld_files])
 
     // ════════════════════════════════════════════════════════════════
     // STEP 3: Get exposure IVs
     // ════════════════════════════════════════════════════════════════
+
+
+
 
     // find initial exposure IVs. Also performs LD clumping
     ch_exposure = IV_FIRST_PASS(
@@ -68,9 +94,8 @@ workflow {
         params.pvalThreshold,
         params.windowTSS,
         ch_ld_ref,
-        params.pvalClump,
-        params.r2Clump,
-        params.kbClump,
+        ld_clump_params,
+        exposureColumns,
     )
 
     // ════════════════════════════════════════════════════════════════
@@ -87,11 +112,10 @@ workflow {
     // Ensure exposure IVs are in outcome data
     ch_iv = FORMAT_IV(
         ch_exposure_outcome_pairs,
-        params.LDproxyR2,
+        params.ld_proxy_r2_threshold,
         ch_ld_ref,
-        params.pvalClump,
-        params.r2Clump,
-        params.kbClump,
+        ld_clump_params,
+        outcomeColumns
     )
 
     // ════════════════════════════════════════════════════════════════

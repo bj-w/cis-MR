@@ -39,6 +39,7 @@ include { IV_FIRST_PASS } from './modules/iv_first_pass'
 include { FORMAT_IV } from './modules/format_iv'
 include { MR } from './modules/mr'
 
+
 // Workflow
 workflow {
     // ════════════════════════════════════════════════════════════════
@@ -62,7 +63,7 @@ workflow {
     def outcomeColumns = [snp: params.outcome_snp_column, beta: params.outcome_beta_column, se: params.outcome_se_column, pval: params.outcome_pval_column, eaf: params.outcome_eaf_column, effect_allele: params.outcome_effect_allele_column, other_allele: params.outcome_other_allele_column]
 
     // define LD clumping parameters
-    def ld_clump_params = [kb: params.kbClump , r2: params.r2Clump ,pval: params.pvalClump]
+    def ld_clump_params = [kb: params.kbClump, r2: params.r2Clump, pval: params.pvalClump]
 
     // ════════════════════════════════════════════════════════════════
     // STEP 2: Setup reference files
@@ -83,9 +84,6 @@ workflow {
     // ════════════════════════════════════════════════════════════════
     // STEP 3: Get exposure IVs
     // ════════════════════════════════════════════════════════════════
-
-
-
 
     // find initial exposure IVs. Also performs LD clumping
     ch_exposure = IV_FIRST_PASS(
@@ -115,7 +113,7 @@ workflow {
         params.ld_proxy_r2_threshold,
         ch_ld_ref,
         ld_clump_params,
-        outcomeColumns
+        outcomeColumns,
     )
 
     // ════════════════════════════════════════════════════════════════
